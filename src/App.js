@@ -11,9 +11,9 @@ import "./styles/App.css"
 
 function App() {
   const [posts, setPosts] = useState([
-    { id: 1, title: "Javascript1", body: "Description1" },
-    { id: 2, title: "Javascript2", body: "Description2" },
-    { id: 3, title: "Javascript3", body: "Description3" },
+    { id: 1, title: "Java", body: "Web-browsers" },
+    { id: 2, title: "Python", body: "Backend" },
+    { id: 3, title: "C++", body: "Computer Vision" },
   ])
 
   const createPost = (newPost) => {
@@ -24,11 +24,11 @@ function App() {
     setPosts(posts.filter((p) => p.id !== post.id))
   }
 
-  const [selectedSort, setSelectedSort] = useState('');
+  const [selectedSort, setSelectedSort] = useState("")
 
   const sortPosts = (sort) => {
-    setSelectedSort(sort);
-    console.log(sort);
+    setSelectedSort(sort)
+    setPosts([...posts].sort((a,b) => a[sort].localeCompare(b[sort])))
   }
 
   return (
@@ -40,7 +40,10 @@ function App() {
           value={selectedSort}
           onChange={sortPosts}
           defaultValue="Sort by"
-          options={[{ value: "title", name: "By name" }, { value: "body", name: "By description" }]}
+          options={[
+            { value: "title", name: "By name" },
+            { value: "body", name: "By description" },
+          ]}
         />
       </div>
       {posts.length ? (
