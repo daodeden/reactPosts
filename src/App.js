@@ -1,6 +1,7 @@
-import { useRef, useState } from "react"
+import { useRef, useState, useMemo } from "react"
 import ClassCounter from "./components/ClassCounter"
 import Counter from "./components/Counter"
+import PostFilter from "./components/PostFilter"
 import PostForm from "./components/PostForm"
 import PostItem from "./components/PostItem"
 import PostsList from "./components/PostsList"
@@ -24,30 +25,33 @@ function App() {
     setPosts(posts.filter((p) => p.id !== post.id))
   }
 
-  const [selectedSort, setSelectedSort] = useState("")
+  const [filter, setFilter] = useState({sort: '', query: ''})
 
-  const sortPosts = (sort) => {
-    setSelectedSort(sort)
-    setPosts([...posts].sort((a,b) => a[sort].localeCompare(b[sort])))
-  }
+  const sortedPosts = useMemo(() => {
+    console.log("get sorted")
+    if (filter.sort) {
+      return [...posts].sort((a, b) =>
+        a[filter.sort].localeCompare(b[filter.sort])
+      )
+    }
+    return posts
+  }, [filter.sort, posts])
+
+  const sortedAndSearchedPosts = useMemo(() => {
+    return sortedPosts.filter(post => post.title.toLowerCase().includes(filter.query.toLowerCase()))
+  }, [filter.query, sortedPosts])
 
   return (
     <div className="App">
       <PostForm create={createPost} />
       <hr style={{ margin: "15px 0" }}></hr>
-      <div>
-        <MySelect
-          value={selectedSort}
-          onChange={sortPosts}
-          defaultValue="Sort by"
-          options={[
-            { value: "title", name: "By name" },
-            { value: "body", name: "By description" },
-          ]}
+      <PostFilter filter={filter} setFilter={setFilter}/>
+      {sortedAndSearchedPosts.length ? (
+        <PostsList
+          remove={removePost}
+          posts={sortedAndSearchedPosts}
+          title="Список постов 1"
         />
-      </div>
-      {posts.length ? (
-        <PostsList remove={removePost} posts={posts} title="Список постов 1" />
       ) : (
         <h1 style={{ textAlign: "center" }}>"No posts"</h1>
       )}
